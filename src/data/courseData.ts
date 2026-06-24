@@ -1,9 +1,80 @@
 import type { MenuNode } from '../types';
 
 export const COURSE_TITLE =
-  'INFOGRAPHIC CHEMISTRY AND INTRODUCTORY BIOCHEMISTRY';
+  'CHEMISTRY AND INTRODUCTORY BIOCHEMISTRY';
 
 export const DEFAULT_INFOGRAPHIC = '/I_C_I_B.png';
+
+export const CHAPTER_COLORS: Record<string, string> = {
+  'General Chemistry': '#14213d',
+  'Organic Chemistry': '#2d4636',
+  'Introductory Biochemistry': '#d36b31',
+};
+
+export const CHAPTER_IDS: Record<string, string> = {
+  'General Chemistry': 'gc',
+  'Organic Chemistry': 'oc',
+  'Introductory Biochemistry': 'ib',
+};
+
+export interface LeafContext {
+  chapter: string;
+  subchapter: string;
+  chapterId: string;
+  color: string;
+}
+
+function walkBranch(
+  node: MenuNode,
+  chapterLabel: string,
+  chapterId: string,
+  color: string,
+  parentLabel: string | null,
+  code: string,
+): LeafContext | null {
+  if (node.type === 'leaf') {
+    if (node.code !== code) return null;
+    return {
+      chapter: chapterLabel,
+      subchapter: parentLabel ?? node.label,
+      chapterId,
+      color,
+    };
+  }
+
+  for (const child of node.children) {
+    const found = walkBranch(child, chapterLabel, chapterId, color, node.label, code);
+    if (found) return found;
+  }
+
+  return null;
+}
+
+export function findLeafContext(code: string): LeafContext | null {
+  for (const chapter of courseMenu) {
+    if (chapter.type !== 'branch') continue;
+
+    const chapterId = CHAPTER_IDS[chapter.label] ?? 'gc';
+    const color = CHAPTER_COLORS[chapter.label] ?? '#14213d';
+
+    for (const child of chapter.children) {
+      const found = walkBranch(child, chapter.label, chapterId, color, null, code);
+      if (found) return found;
+    }
+  }
+
+  return null;
+}
+
+export function countChapterTopics(chapter: MenuNode): number {
+  if (chapter.type === 'leaf') return 1;
+
+  let count = 0;
+  for (const child of chapter.children) {
+    count += countChapterTopics(child);
+  }
+  return count;
+}
 
 export const courseMenu: MenuNode[] = [
   {

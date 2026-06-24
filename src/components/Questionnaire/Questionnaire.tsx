@@ -7,7 +7,7 @@ interface Question {
 
 interface QuestionnaireProps {
   src: string;
-  title: string;
+  urlKey: string;
 }
 
 function parseCsv(text: string): Question[] {
@@ -36,100 +36,102 @@ function parseCsv(text: string): Question[] {
   return questions;
 }
 
-export function Questionnaire({ src, title }: QuestionnaireProps) {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
+export function Questionnaire({ src, urlKey }: QuestionnaireProps) {
+  const [questions, setQuestions] = useState<Question[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
+    setQuestions(null);
     setError(null);
-    setCurrentIndex(0);
+    setIndex(0);
     setRevealed(false);
 
     fetch(src)
       .then((res) => {
-        if (!res.ok) throw new Error('Questionnaire not found');
+        if (!res.ok) throw new Error(`Could not load questionnaire (${res.status}).`);
         return res.text();
       })
       .then((text) => {
+        if (cancelled) return;
         const parsed = parseCsv(text);
-        if (parsed.length === 0) throw new Error('No questions found');
+        if (parsed.length === 0) throw new Error('No questions in this file.');
         setQuestions(parsed);
       })
-      .catch((err: Error) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [src]);
+      .catch((err: Error) => {
+        if (!cancelled) setError(err.message);
+      });
 
-  if (loading) {
-    return <div className="content-placeholder">Loading questionnaire…</div>;
-  }
+    return () => {
+      cancelled = true;
+    };
+  }, [src, urlKey]);
 
-  if (error) {
-    return (
-      <div className="content-error">
-        <p>Could not load questionnaire.</p>
-        <p className="content-error-detail">{error}</p>
-        <p className="content-error-file">Expected file: {src}</p>
-      </div>
-    );
-  }
+  if (error) return <p className="muted">{error}</p>;
+  if (!questions) return <p className="muted">Loading questions…</p>;
+  if (questions.length === 0) return <p className="muted">No questions in this file.</p>;
 
-  const current = questions[currentIndex];
+  const card = questions[index]!;
+  const atStart = index === 0;
+  const atEnd = index >= questions.length - 1;
+
+  const goPrevious = () => {
+    if (atStart) return;
+    setIndex((i) => i - 1);
+    setRevealed(false);
+  };
+
+  const goNext = () => {
+    if (atEnd) return;
+    setIndex((i) => i + 1);
+    setRevealed(false);
+  };
 
   return (
     <div className="questionnaire">
-      <div className="questionnaire-header">
-        <h3>{title}</h3>
-        <span className="questionnaire-counter">
-          {currentIndex + 1} / {questions.length}
-        </span>
-      </div>
+      <p className="questionnaire__progress">
+        Question {index + 1} of {questions.length}
+      </p>
 
-      <div className="question-card">
-        <p className="question-text">{current.question}</p>
-        {revealed ? (
-          <div className="answer-box">
-            <span className="answer-label">Answer</span>
-            <p className="answer-text">{current.answer}</p>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="reveal-btn"
-            onClick={() => setRevealed(true)}
-          >
-            Reveal Answer
-          </button>
-        )}
-      </div>
-
-      <div className="questionnaire-nav">
+      <div className="questionnaire__nav-row">
         <button
           type="button"
-          className="nav-btn"
-          disabled={currentIndex === 0}
-          onClick={() => {
-            setCurrentIndex((i) => i - 1);
-            setRevealed(false);
-          }}
+          className="questionnaire__arrow"
+          onClick={goPrevious}
+          disabled={atStart}
+          aria-label="Previous question"
         >
-          Previous
+          ←
         </button>
+
+        <div className="questionnaire__card">
+          <p className="questionnaire__question">{card.question}</p>
+          {revealed ? (
+            <div className="questionnaire__answer">
+              <span className="questionnaire__answer-label">Answer</span>
+              <p>{card.answer}</p>
+            </div>
+          ) : null}
+        </div>
+
         <button
           type="button"
-          className="nav-btn primary"
-          disabled={currentIndex === questions.length - 1}
-          onClick={() => {
-            setCurrentIndex((i) => i + 1);
-            setRevealed(false);
-          }}
+          className="questionnaire__arrow"
+          onClick={goNext}
+          disabled={atEnd}
+          aria-label="Next question"
         >
-          Next
+          →
         </button>
       </div>
+
+      {!revealed ? (
+        <button type="button" className="questionnaire__reveal" onClick={() => setRevealed(true)}>
+          Show answer
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -1,40 +1,43 @@
-import { courseMenu } from '../../data/courseData';
+import {
+  CHAPTER_COLORS,
+  CHAPTER_IDS,
+  courseMenu,
+} from '../../data/courseData';
 import type { LeafNode } from '../../types';
 import { AccordionItem } from './AccordionItem';
 
 interface SidebarProps {
   selectedCode: string | null;
+  openChapters: Record<string, boolean>;
+  onToggleChapter: (label: string) => void;
   onSelectLeaf: (leaf: LeafNode) => void;
-  onHome: () => void;
 }
 
-export function Sidebar({ selectedCode, onSelectLeaf, onHome }: SidebarProps) {
-  const isHome = selectedCode === null;
-
+export function Sidebar({
+  selectedCode,
+  openChapters,
+  onToggleChapter,
+  onSelectLeaf,
+}: SidebarProps) {
   return (
-    <aside className="sidebar">
-      <button
-        type="button"
-        className={`sidebar-home${isHome ? ' active' : ''}`}
-        onClick={onHome}
-      >
-        <span className="home-icon" aria-hidden="true">
-          ⌂
-        </span>
-        Course Overview
-      </button>
-      <nav className="sidebar-nav" aria-label="Course chapters">
-        {courseMenu.map((chapter, index) => (
+    <nav className="sidebar" aria-label="Course chapters">
+      {courseMenu.map((chapter) => {
+        if (chapter.type !== 'branch') return null;
+
+        return (
           <AccordionItem
             key={chapter.label}
             node={chapter}
             depth={0}
             selectedCode={selectedCode}
             onSelectLeaf={onSelectLeaf}
-            defaultOpen={index === 0}
+            chapterColor={CHAPTER_COLORS[chapter.label]}
+            chapterId={CHAPTER_IDS[chapter.label]}
+            open={openChapters[chapter.label] ?? false}
+            onToggle={() => onToggleChapter(chapter.label)}
           />
-        ))}
-      </nav>
-    </aside>
+        );
+      })}
+    </nav>
   );
 }
