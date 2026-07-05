@@ -84,7 +84,7 @@ export function ContentArea({ selectedLeaf, eyebrow }: ContentAreaProps) {
         </div>
       ) : null}
 
-      <div className="media-stage" role="tabpanel">
+      <div className="media-stage" role="tabpanel" onContextMenu={(event) => event.preventDefault()}>
         {resource === 'video' &&
           (mediaError ? (
             <MediaFallback path={mediaPath} type="Video" />
@@ -93,6 +93,8 @@ export function ContentArea({ selectedLeaf, eyebrow }: ContentAreaProps) {
               key={mediaPath}
               className="video"
               controls
+              controlsList="nodownload"
+              playsInline
               preload="metadata"
               src={mediaPath}
               onError={() => setMediaError(true)}
@@ -109,6 +111,7 @@ export function ContentArea({ selectedLeaf, eyebrow }: ContentAreaProps) {
               key={mediaPath}
               className="audio"
               controls
+              controlsList="nodownload"
               preload="metadata"
               src={mediaPath}
               onError={() => setMediaError(true)}
