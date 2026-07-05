@@ -1,5 +1,5 @@
 What is the chemical definition of a carbohydrate?,"Carbohydrates are polyhydroxy aldehydes, polyhydroxy ketones, or substances that yield them upon hydrolysis."
-What is the general empirical formula for most simple carbohydrates?,"$(CH_2O)_n$, where $n \ge 3$."
+What is the general empirical formula for most simple carbohydrates?,"(CH_2O)_n, where n \ge 3."
 What naming convention is used for the common names of most sugars?,"They end with the suffix ""-ose""."
 What is the distinction between an 'aldose' and a 'ketose'?,"An aldose has a carbonyl group at the end of the carbon chain (aldehyde), while a ketose has it at any other position (ketone)."
 How are monosaccharides classified based on the number of carbon atoms in their backbone?,"They are named by the number of carbons followed by the suffix -ose (e.g., triose, tetrose, pentose, hexose)."
@@ -9,7 +9,7 @@ Which three-carbon monosaccharide is the simplest ketose?,Dihydroxyacetone (a ke
 "What is the primary six-carbon aldohexose found in nature, often called dextrose?",D-glucose.
 How is D-fructose classified according to its functional group and carbon count?,It is a ketohexose.
 "Except for dihydroxyacetone, all monosaccharides contain one or more _____.",Asymmetric (chiral) carbon atoms.
-What is the formula used to calculate the number of possible stereoisomers for a sugar with $n$ chiral centers?,$2^n$.
+What is the formula used to calculate the number of possible stereoisomers for a sugar with n chiral centers?,2^n.
 "In a Fischer projection of a sugar, what do horizontal and vertical lines represent respectively?",Horizontal lines point toward the viewer; vertical lines point away from the viewer.
 How is a monosaccharide designated as a 'D' isomer in a Fischer projection?,The hydroxyl group on the chiral carbon furthest from the carbonyl group is on the right.
 Term: Enantiomers,"Definition: Stereoisomers that are non-superimposable mirror images of each other, such as D- and L-glyceraldehyde."
@@ -19,10 +19,10 @@ D-glucose and D-galactose are epimers at which carbon position?,Carbon-4 (C-4).
 What chemical reaction creates the cyclic form of an aldose?,The reaction between an aldehyde and an alcohol to form a hemiacetal.
 What chemical reaction creates the cyclic form of a ketose?,The reaction between a ketone and an alcohol to form a hemiketal.
 What is the 'anomeric carbon' in a cyclic sugar?,The carbonyl carbon atom that becomes a new chiral center upon ring closure.
-How are $\alpha$ and $\beta$ anomers distinguished in a Haworth perspective formula for D-glucose?,The $\alpha$ anomer has the hydroxyl group on the opposite side of the ring from C-6; the $\beta$ anomer has it on the same side.
+How are \alpha and \beta anomers distinguished in a Haworth perspective formula for D-glucose?,The \alpha anomer has the hydroxyl group on the opposite side of the ring from C-6; the \beta anomer has it on the same side.
 Term: Pyranose,"Definition: A six-membered ring sugar structure, named for its similarity to the compound pyran."
 Term: Furanose,"Definition: A five-membered ring sugar structure, named for its similarity to the compound furan."
-What is the process called when $\alpha$ and $\beta$ anomers interconvert in solution to reach equilibrium?,Mutarotation.
+What is the process called when \alpha and \beta anomers interconvert in solution to reach equilibrium?,Mutarotation.
 Why is a chair conformation more accurate than a Haworth projection for representing hexoses?,It accounts for the fact that the atoms in the six-membered ring are not actually in a single plane.
 Which two five-carbon sugars are essential structural components of nucleic acids?,D-ribose (in RNA) and 2-deoxy-D-ribose (in DNA).
 What modification distinguishes 2-deoxy-D-ribose from D-ribose?,The hydroxyl group at the Carbon-2 (C-2) position is replaced by a hydrogen atom.
@@ -32,8 +32,8 @@ Term: Amino Sugar,"Definition: A sugar derivative where a hydroxyl group (usuall
 What bond links a monosaccharide to another molecule through its anomeric carbon?,A glycosidic bond.
 Under what condition is a sugar classified as a 'reducing sugar'?,When it has a free anomeric carbon that can be oxidized by mild oxidizing agents.
 The end of a sugar chain that contains a free anomeric carbon is called the _____.,Reducing end.
-What is the approximate energy value provided by carbohydrates in the human diet?,$17 kJ/g$ (or $4 kcal/g$).
-Which two human genes encode the protein receptors responsible for detecting sweetness?,$TAS1R2$ and $TAS1R3$.
+What is the approximate energy value provided by carbohydrates in the human diet?,17 kJ/g (or 4 kcal/g).
+Which two human genes encode the protein receptors responsible for detecting sweetness?,TAS1R2 and TAS1R3.
 How does the solubility of monosaccharides in water compare to their solubility in nonpolar solvents?,They are freely soluble in water but insoluble in nonpolar solvents.
 The set of all carbohydrate-containing molecules in a cell is known as the _____.,Glycome.
 Why do cells store glucose as large polymers (like starch or glycogen) instead of individual monomers?,To avoid dangerously high osmotic pressure that would cause the cell to swell and lyse.
@@ -51,9 +51,9 @@ What is the biological role of ribose in ATP?,It serves as the pentose sugar com
 Most monosaccharides in nature belong to which stereochemical series?,The D-series.
 "The Greek word 'sakcharon', from which 'saccharide' is derived, means _____.",Sugar.
 Which monosaccharide is commonly known as 'fruit sugar'?,Fructose.
-"The term 'carbohydrate' originally comes from the French 'hydrates de carbone', suggesting what formula?",$C_x(H_2O)_y$.
+"The term 'carbohydrate' originally comes from the French 'hydrates de carbone', suggesting what formula?",C_x(H_2O)_y.
 Which monosaccharide is the C-4 epimer of glucose and is a component of lactose?,Galactose.
-"In the naming of glycosidic bonds, what does the notation $(1 \rightarrow 4)$ indicate?",A bond between Carbon-1 of the first sugar and Carbon-4 of the second sugar.
+"In the naming of glycosidic bonds, what does the notation (1 \rightarrow 4) indicate?",A bond between Carbon-1 of the first sugar and Carbon-4 of the second sugar.
 What type of sugar contains a hydrogen atom instead of one of its hydroxyl groups?,A deoxy sugar.
 What is the primary source of carbohydrates for the animal kingdom?,The plant kingdom (via photosynthesis).
 How many chiral centers are present in the open-chain form of D-glucose?,Four.
