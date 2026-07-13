@@ -8,8 +8,11 @@ interface AccordionItemProps {
   onSelectLeaf: (leaf: LeafNode) => void;
   chapterColor?: string;
   chapterId?: string;
+  chapterTitle?: string;
+  locked?: boolean;
   open?: boolean;
   onToggle?: () => void;
+  onLockedChapter?: () => void;
 }
 
 export function AccordionItem({
@@ -19,8 +22,10 @@ export function AccordionItem({
   onSelectLeaf,
   chapterColor,
   chapterId,
+  locked = false,
   open: controlledOpen,
   onToggle,
+  onLockedChapter,
 }: AccordionItemProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = depth === 0 && onToggle !== undefined;
@@ -53,22 +58,29 @@ export function AccordionItem({
   if (depth === 0 && chapterColor && chapterId) {
     return (
       <div
-        className={`accordion accordion--chapter${open ? ' is-open' : ''}`}
+        className={`accordion accordion--chapter${open ? ' is-open' : ''}${locked ? ' is-locked' : ''}`}
         data-chapter={chapterId}
       >
         <button
           type="button"
-          className="accordion-trigger accordion-trigger--chapter"
+          className={`accordion-trigger accordion-trigger--chapter${locked ? ' accordion-trigger--locked' : ''}`}
           style={{ backgroundColor: chapterColor }}
-          aria-expanded={open}
-          onClick={handleToggle}
+          aria-expanded={locked ? false : open}
+          aria-disabled={locked || undefined}
+          onClick={() => {
+            if (locked) {
+              onLockedChapter?.();
+              return;
+            }
+            handleToggle();
+          }}
         >
           <span className="chevron" aria-hidden>
-            {open ? '▼' : '▶'}
+            {locked ? '🔒' : open ? '▼' : '▶'}
           </span>
           <span className="chapter-name">{node.label}</span>
         </button>
-        {open ? (
+        {open && !locked ? (
           <div className="section-tree" style={{ borderTopColor: chapterColor }}>
             {node.children.map((child) => (
               <AccordionItem

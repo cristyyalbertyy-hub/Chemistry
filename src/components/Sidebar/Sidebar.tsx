@@ -9,20 +9,26 @@ import { AccordionItem } from './AccordionItem';
 interface SidebarProps {
   selectedCode: string | null;
   openChapters: Record<string, boolean>;
+  hasChapterAccess?: (chapterId: string) => boolean;
   onToggleChapter: (label: string) => void;
   onSelectLeaf: (leaf: LeafNode) => void;
+  onLockedChapter?: (chapterId: string, chapterTitle: string) => void;
 }
 
 export function Sidebar({
   selectedCode,
   openChapters,
+  hasChapterAccess,
   onToggleChapter,
   onSelectLeaf,
+  onLockedChapter,
 }: SidebarProps) {
   return (
     <nav className="sidebar" aria-label="Course chapters">
       {courseMenu.map((chapter) => {
         if (chapter.type !== 'branch') return null;
+        const chapterId = CHAPTER_IDS[chapter.label];
+        const locked = chapterId && hasChapterAccess ? !hasChapterAccess(chapterId) : false;
 
         return (
           <AccordionItem
@@ -32,9 +38,16 @@ export function Sidebar({
             selectedCode={selectedCode}
             onSelectLeaf={onSelectLeaf}
             chapterColor={CHAPTER_COLORS[chapter.label]}
-            chapterId={CHAPTER_IDS[chapter.label]}
+            chapterId={chapterId}
+            chapterTitle={chapter.label}
+            locked={locked}
             open={openChapters[chapter.label] ?? false}
             onToggle={() => onToggleChapter(chapter.label)}
+            onLockedChapter={
+              chapterId
+                ? () => onLockedChapter?.(chapterId, chapter.label)
+                : undefined
+            }
           />
         );
       })}
