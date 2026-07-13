@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ContentArea } from './components/ContentArea/ContentArea';
+import { LockedChapterPanel } from './components/LockedChapterPanel';
 import { Sidebar } from './components/Sidebar/Sidebar';
+import { useAuth } from './context/AuthContext';
 import {
   CHAPTER_COLORS,
   CHAPTER_IDS,
@@ -21,10 +23,13 @@ function collapsedChapters(): Record<string, boolean> {
 }
 
 export default function App() {
+  const { hasChapterAccess, userEmail, logout } = useAuth();
   const [selectedLeaf, setSelectedLeaf] = useState<LeafNode | null>(null);
   const [atHome, setAtHome] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(true);
   const [openChapters, setOpenChapters] = useState(collapsedChapters);
+  const [lockedChapterId, setLockedChapterId] = useState<string | null>(null);
+  const [lockedChapterTitle, setLockedChapterTitle] = useState('');
   const mainRef = useRef<HTMLElement>(null);
 
   const leafContext = useMemo(
@@ -96,15 +101,35 @@ export default function App() {
   );
 
   const toggleChapter = (label: string) => {
+    const chapterId = CHAPTER_IDS[label];
+    if (chapterId && !hasChapterAccess(chapterId)) {
+      setLockedChapterId(chapterId);
+      setLockedChapterTitle(label);
+      setAtHome(false);
+      setSelectedLeaf(null);
+      setMobileMenuOpen(false);
+      return;
+    }
+    setLockedChapterId(null);
     setOpenChapters((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
   const selectLeaf = (leaf: LeafNode) => {
+    const context = findLeafContext(leaf.code);
+    if (context && !hasChapterAccess(context.chapterId)) {
+      setLockedChapterId(context.chapterId);
+      setLockedChapterTitle(context.chapter);
+      setAtHome(false);
+      setSelectedLeaf(null);
+      setMobileMenuOpen(false);
+      return;
+    }
+
+    setLockedChapterId(null);
     setAtHome(false);
     setSelectedLeaf(leaf);
     setMobileMenuOpen(false);
 
-    const context = findLeafContext(leaf.code);
     if (context) {
       const next = collapsedChapters();
       next[context.chapter] = true;
@@ -123,6 +148,7 @@ export default function App() {
   const goToEntry = () => {
     setAtHome(true);
     setSelectedLeaf(null);
+    setLockedChapterId(null);
     setMobileMenuOpen(false);
     setOpenChapters(collapsedChapters());
   };
@@ -155,6 +181,18 @@ export default function App() {
           <span className="home-overview-btn__label">Course overview</span>
         </button>
         <h1>{COURSE_TITLE}</h1>
+        {userEmail ? (
+          <div className="app-header__actions">
+            <div className="auth-account">
+              <span className="auth-account__email" title={userEmail}>
+                {userEmail}
+              </span>
+              <button type="button" className="btn-ghost" onClick={() => void logout()}>
+                Sair
+              </button>
+            </div>
+          </div>
+        ) : null}
       </header>
 
       {showMobileLessonBar && mobileLessonContext ? (
@@ -177,8 +215,16 @@ export default function App() {
           <Sidebar
             selectedCode={selectedLeaf?.code ?? null}
             openChapters={openChapters}
+            hasChapterAccess={hasChapterAccess}
             onToggleChapter={toggleChapter}
             onSelectLeaf={selectLeaf}
+            onLockedChapter={(chapterId, chapterTitle) => {
+              setLockedChapterId(chapterId);
+              setLockedChapterTitle(chapterTitle);
+              setAtHome(false);
+              setSelectedLeaf(null);
+              setMobileMenuOpen(false);
+            }}
           />
         </div>
 
@@ -189,6 +235,11 @@ export default function App() {
         >
           {atHome ? (
             overviewPanel
+          ) : lockedChapterId ? (
+            <LockedChapterPanel
+              chapterId={lockedChapterId}
+              chapterTitle={lockedChapterTitle || lockedChapterId}
+            />
           ) : selectedLeaf && leafContext ? (
             <ContentArea
               key={selectedLeaf.code}
