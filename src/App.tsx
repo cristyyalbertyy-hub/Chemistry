@@ -3,10 +3,10 @@ import { ContentArea } from './components/ContentArea/ContentArea';
 import { LockedChapterPanel } from './components/LockedChapterPanel';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { useAuth } from './context/AuthContext';
+import { resolveAppTitle, resolveOverviewLead } from './lib/packageAccess';
 import {
   CHAPTER_COLORS,
   CHAPTER_IDS,
-  COURSE_TITLE,
   countChapterTopics,
   courseMenu,
   DEFAULT_INFOGRAPHIC,
@@ -23,7 +23,7 @@ function collapsedChapters(): Record<string, boolean> {
 }
 
 export default function App() {
-  const { hasChapterAccess, userEmail, logout } = useAuth();
+  const { hasChapterAccess, hasFullAccess, ownedPackageIds, launchPackageId, userEmail, logout } = useAuth();
   const [selectedLeaf, setSelectedLeaf] = useState<LeafNode | null>(null);
   const [atHome, setAtHome] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(true);
@@ -59,16 +59,29 @@ export default function App() {
 
   const showMobileLessonBar = !mobileMenuOpen && !atHome && mobileLessonContext !== null;
   const shellMode = mobileMenuOpen ? 'is-mobile-menu' : 'is-mobile-content';
+  const appTitle = useMemo(
+    () => resolveAppTitle(ownedPackageIds, launchPackageId),
+    [ownedPackageIds, launchPackageId],
+  );
+  const overviewLead = useMemo(
+    () => resolveOverviewLead(ownedPackageIds, launchPackageId),
+    [ownedPackageIds, launchPackageId],
+  );
+  const visibleChapters = useMemo(
+    () => courseMenu.filter((chapter) => {
+      if (chapter.type !== 'branch') return false;
+      const chapterId = CHAPTER_IDS[chapter.label];
+      return chapterId ? hasChapterAccess(chapterId) : true;
+    }),
+    [hasChapterAccess],
+  );
 
   const overviewPanel = (
     <div className="overview-panel">
       <div className="overview-intro">
-        <p className="overview-lead">
-          General chemistry, organic chemistry and introductory biochemistry — video, podcast,
-          infographic and quiz for each topic.
-        </p>
+        <p className="overview-lead">{overviewLead}</p>
         <ul className="overview-systems" aria-label="Course chapters">
-          {courseMenu.map((chapter) => {
+          {visibleChapters.map((chapter) => {
             if (chapter.type !== 'branch') return null;
             const topicCount = countChapterTopics(chapter);
             return (
@@ -88,7 +101,7 @@ export default function App() {
       </div>
       <img
         src={DEFAULT_INFOGRAPHIC}
-        alt="Chemistry and Introductory Biochemistry — course overview"
+        alt={`${appTitle} — course overview`}
         className="overview-infographic"
       />
       <p className="overview-hint muted">
@@ -180,7 +193,7 @@ export default function App() {
           </span>
           <span className="home-overview-btn__label">Course overview</span>
         </button>
-        <h1>{COURSE_TITLE}</h1>
+        <h1>{appTitle}</h1>
         {userEmail ? (
           <div className="app-header__actions">
             <div className="auth-account">
@@ -218,6 +231,7 @@ export default function App() {
             hasChapterAccess={hasChapterAccess}
             onToggleChapter={toggleChapter}
             onSelectLeaf={selectLeaf}
+            hideLockedChapters={!hasFullAccess}
             onLockedChapter={(chapterId, chapterTitle) => {
               setLockedChapterId(chapterId);
               setLockedChapterTitle(chapterTitle);

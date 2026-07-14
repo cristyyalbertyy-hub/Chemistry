@@ -13,6 +13,7 @@ interface SidebarProps {
   onToggleChapter: (label: string) => void;
   onSelectLeaf: (leaf: LeafNode) => void;
   onLockedChapter?: (chapterId: string, chapterTitle: string) => void;
+  hideLockedChapters?: boolean;
 }
 
 export function Sidebar({
@@ -22,6 +23,7 @@ export function Sidebar({
   onToggleChapter,
   onSelectLeaf,
   onLockedChapter,
+  hideLockedChapters = false,
 }: SidebarProps) {
   return (
     <nav className="sidebar" aria-label="Course chapters">
@@ -29,7 +31,7 @@ export function Sidebar({
         if (chapter.type !== 'branch') return null;
         const chapterId = CHAPTER_IDS[chapter.label];
         const locked = chapterId && hasChapterAccess ? !hasChapterAccess(chapterId) : false;
-
+        if (hideLockedChapters && locked) return null;
         return (
           <AccordionItem
             key={chapter.label}
