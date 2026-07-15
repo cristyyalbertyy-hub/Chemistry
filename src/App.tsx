@@ -3,13 +3,12 @@ import { ContentArea } from './components/ContentArea/ContentArea';
 import { LockedChapterPanel } from './components/LockedChapterPanel';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { useAuth } from './context/AuthContext';
-import { resolveAppTitle, resolveOverviewLead } from './lib/packageAccess';
+import { resolveAppTitle, resolveOverviewImage, resolveOverviewLead } from './lib/packageAccess';
 import {
   CHAPTER_COLORS,
   CHAPTER_IDS,
   countChapterTopics,
   courseMenu,
-  DEFAULT_INFOGRAPHIC,
   findLeafContext,
 } from './data/courseData';
 import type { LeafNode } from './types';
@@ -67,6 +66,10 @@ export default function App() {
     () => resolveOverviewLead(ownedPackageIds, launchPackageId),
     [ownedPackageIds, launchPackageId],
   );
+  const overviewImage = useMemo(
+    () => resolveOverviewImage(ownedPackageIds, launchPackageId),
+    [ownedPackageIds, launchPackageId],
+  );
   const visibleChapters = useMemo(
     () => courseMenu.filter((chapter) => {
       if (chapter.type !== 'branch') return false;
@@ -100,7 +103,7 @@ export default function App() {
         </ul>
       </div>
       <img
-        src={DEFAULT_INFOGRAPHIC}
+        src={overviewImage}
         alt={`${appTitle} — course overview`}
         className="overview-infographic"
       />
@@ -181,7 +184,7 @@ export default function App() {
         >
           <span className="home-overview-btn__media">
             <img
-              src={DEFAULT_INFOGRAPHIC}
+              src={overviewImage}
               alt=""
               onError={(e) => {
                 e.currentTarget.style.display = 'none';

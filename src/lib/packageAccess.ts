@@ -32,6 +32,12 @@ export const PACKAGE_OVERVIEW_LEADS: Record<string, string> = {
     'General chemistry, organic chemistry and introductory biochemistry — video, podcast, infographic and quiz for each topic.',
 }
 
+export const PACKAGE_OVERVIEW_IMAGES: Record<string, string> = {
+  chemistry: '/Chemistry.png',
+  'introductory-biochemistry': '/IntroductionBiochemistry.png',
+  'chemistry-introductory-biochemistry': '/I_C_I_B.png',
+}
+
 export function resolveAppTitle(
   ownedPackageIds: string[],
   launchPackageId?: string | null,
@@ -71,6 +77,28 @@ export function resolveOverviewLead(
   )
   if (partials.length === 1) {
     return PACKAGE_OVERVIEW_LEADS[partials[0]] ?? fallback
+  }
+
+  return fallback
+}
+
+export function resolveOverviewImage(
+  ownedPackageIds: string[],
+  launchPackageId?: string | null,
+  fallback = PACKAGE_OVERVIEW_IMAGES[PARENT_APP_ID],
+): string {
+  const launch = launchPackageId?.trim()
+  if (launch && PACKAGE_OVERVIEW_IMAGES[launch]) return PACKAGE_OVERVIEW_IMAGES[launch]
+
+  if (ownedPackageIds.includes(PARENT_APP_ID)) {
+    return PACKAGE_OVERVIEW_IMAGES[PARENT_APP_ID] ?? fallback
+  }
+
+  const partials = RELEVANT_PACKAGE_IDS.filter(
+    (id) => id !== PARENT_APP_ID && ownedPackageIds.includes(id),
+  )
+  if (partials.length === 1) {
+    return PACKAGE_OVERVIEW_IMAGES[partials[0]] ?? fallback
   }
 
   return fallback
