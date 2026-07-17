@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { LeafNode, ResourceType } from '../../types';
 import { getMediaPath } from '../../utils/resourcePaths';
+import { useMediaProgress } from '../../hooks/useMediaProgress';
+import { bindPlaybackProgress } from '../../lib/playbackProgress';
 import { Questionnaire } from '../Questionnaire/Questionnaire';
 
 interface ContentAreaProps {
@@ -28,6 +30,21 @@ export function ContentArea({ selectedLeaf, eyebrow }: ContentAreaProps) {
   const [resource, setResource] = useState<ResourceType>('video');
   const [infographicVariant, setInfographicVariant] = useState<'I' | 'II'>('I');
   const [mediaError, setMediaError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const { trackWatchComplete } = useMediaProgress(selectedLeaf.code, selectedLeaf.code);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el || resource !== 'video') return;
+    return bindPlaybackProgress(el, () => void trackWatchComplete('V'));
+  }, [resource, selectedLeaf.code, trackWatchComplete]);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el || resource !== 'podcast') return;
+    return bindPlaybackProgress(el, () => void trackWatchComplete('P'));
+  }, [resource, selectedLeaf.code, trackWatchComplete]);
 
   const handleResourceChange = (r: ResourceType) => {
     setResource(r);
@@ -90,6 +107,7 @@ export function ContentArea({ selectedLeaf, eyebrow }: ContentAreaProps) {
             <MediaFallback path={mediaPath} type="Video" />
           ) : (
             <video
+              ref={videoRef}
               key={mediaPath}
               className="video"
               controls
@@ -108,6 +126,7 @@ export function ContentArea({ selectedLeaf, eyebrow }: ContentAreaProps) {
             <MediaFallback path={mediaPath} type="Podcast" />
           ) : (
             <audio
+              ref={audioRef}
               key={mediaPath}
               className="audio"
               controls
